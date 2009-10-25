@@ -22,7 +22,7 @@ ICON_NAMES_MAPPING = {
 def init_resources():
     LOADED_RESOURCES['icons'] = {}
 
-def load_icon(icon_name):
+def load_icon(icon_name, method=wx.Bitmap):
     """
     Loads icon on demand (lazy), makes use of ICON_NAMES_MAPPING defined above
     """
@@ -37,6 +37,6 @@ def load_icon(icon_name):
     try:
         return LOADED_RESOURCES['icons'][icon_name]
     except KeyError:
-        loaded = wx.Bitmap(os.path.join(ICONS_PATH, icon_name))
+        loaded = method(os.path.join(ICONS_PATH, icon_name))
         LOADED_RESOURCES['icons'][icon_name]= loaded
         return loaded
