@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 2009-10-15
 
@@ -12,6 +13,12 @@ from generated.plingoframe import PlingoFrameGenerated
 import resources
 
 #TODO: Unicode support in textCtrls!
+
+sample_wordlist = {
+                   "python": ['pyton', 'wąż'],
+                   "blablabla":['niewiadomoco']}
+
+
 
 class PlingoFrame(PlingoFrameGenerated):
     messages  = {
@@ -88,8 +95,8 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def init_gui_wordlist(self):
         #TODO: Hide it before search?
-        self.wordList.InsertColumn(0, "input")
-        self.wordList.InsertColumn(1, "translation")
+        self.wordList.populate(sample_wordlist)
+        
     
     def init_gui_languages(self):
         #TODO: Load resources for BitmapComboBox
