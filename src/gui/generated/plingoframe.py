@@ -65,7 +65,7 @@ class PlingoFrameGenerated(wx.Frame):
         sizer_3.Add(basicInterfaceSizer, 1, wx.EXPAND, 0)
         sizer_3.Add(menuSizer, 0, wx.EXPAND, 0)
         mainSizer.Add(sizer_3, 0, wx.EXPAND, 0)
-        mainSizer.Add(self.wordList, 1, wx.ALL|wx.EXPAND, 5)
+        mainSizer.Add(self.wordList, 1, wx.ALL|wx.EXPAND, 3)
         topSizer.Add(mainSizer, 1, wx.EXPAND, 0)
         self.SetSizer(topSizer)
         topSizer.Fit(self)
