@@ -1,0 +1,4 @@
+#kate backups
+*~
+#python bytecode
+*.pyc
