@@ -35,7 +35,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.status_icons = {}
         self.input_widget = None
         self.mode = "single"
-        self.already_searching = True
+        self.disable_autosearch = True
         self.next_status = None
         self.letter_entered_timer = 0
     
@@ -179,11 +179,11 @@ class PlingoFrame(PlingoFrameGenerated):
         if not self.get_input_text(): return
         print("Searching for \"{0}\"".format(self.get_input_text()))
         #search done shoud be returned by plugin?
-        self.already_searching = True
+        self.disable_autosearch = True
         self.search_started()
     
     def stop_search(self):
-        self.already_searching = False
+        pass
     
     def set_status(self, msg=None, search_status=None):
         """
@@ -252,10 +252,10 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def OnLetterEntered(self, evt):
         if len(self.get_input_text()):
-            self.already_searching = False
+            self.disable_autosearch = False
             self.letter_entered_timer = time.time()
         else:
-            self.already_searching = True
+            self.disable_autosearch = True
     
     def OnDebug(self, evt):
         frame = ShellFrame(parent=self)
@@ -264,7 +264,7 @@ class PlingoFrame(PlingoFrameGenerated):
         frame.Show()
         
     def OnIdle(self, evt):
-        if not self.already_searching:
+        if not self.disable_autosearch:
             if time.time() - self.letter_entered_timer >= self.auto_search_delay:
                 print "auto search!"
                 self.search()
