@@ -10,7 +10,7 @@ from wx.py.shell import ShellFrame
 from wx.py.filling import FillingFrame
 
 from generated.plingoframe import PlingoFrameGenerated
-import resources
+import artprovider
 
 #TODO: Unicode support in textCtrls!
 
@@ -32,6 +32,7 @@ class PlingoFrame(PlingoFrameGenerated):
     def __init__(self, *args, **kwargs):
         super(PlingoFrame, self).__init__(*args, **kwargs)
         self.debug = kwargs.get('debug', True)
+        wx.ArtProvider.Push(artprovider.PlingoArtProvider())
         self.init_vars()
         self.init_gui()
         self.init_input_widgets()
@@ -71,17 +72,17 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def init_gui_plugin_toolbar(self):
         interfacesToolbar = wx.ToolBar(self, -1)
-        interfacesToolbar.AddCheckLabelTool(wx.ID_ANY, '', resources.load_icon('plugin'))
-        interfacesToolbar.AddCheckLabelTool(wx.ID_ANY, '', resources.load_icon('plugin'))
+        interfacesToolbar.AddCheckLabelTool(wx.ID_ANY, '', self.get_bmp('plugin'))
+        interfacesToolbar.AddCheckLabelTool(wx.ID_ANY, '', self.get_bmp('plugin'))
         interfacesToolbar.Realize()
         self.basicInterfaceSizer.Insert(0, interfacesToolbar)
         self.interfacesToolbar = interfacesToolbar   
     
     def init_gui_tools(self):
-        self.preferencesButton = wx.BitmapButton(self, wx.ID_ANY, resources.load_icon('properties'))
-        self.helpButton = wx.BitmapButton(self, wx.ID_ANY, resources.load_icon('help'))
-        self.debugButton = wx.BitmapButton(self, wx.ID_ANY, resources.load_icon('debug'))
-        self.switchModeButton = wx.BitmapButton(self, wx.ID_ANY, resources.load_icon('switch_mode'))
+        self.preferencesButton = wx.BitmapButton(self, wx.ID_ANY, self.get_bmp("properties"))
+        self.helpButton = wx.BitmapButton(self, wx.ID_ANY, self.get_bmp(wx.ART_HELP))
+        self.debugButton = wx.BitmapButton(self, wx.ID_ANY, self.get_bmp('debug'))
+        self.switchModeButton = wx.BitmapButton(self, wx.ID_ANY, self.get_bmp('switch_mode'))
         #Binding events
         self.debugButton.Bind(wx.EVT_BUTTON, self.OnDebug)
         self.switchModeButton.Bind(wx.EVT_BUTTON, self.OnSwitchMode)
@@ -107,7 +108,7 @@ class PlingoFrame(PlingoFrameGenerated):
         #More stuff may go here later
     
     def init_gui_search_buttons(self):
-        self.searchButton = wx.BitmapButton(self, wx.ID_ANY, resources.load_icon("search"))
+        self.searchButton = wx.BitmapButton(self, wx.ID_ANY, self.get_bmp(wx.ART_FIND))
         self.searchButton.Bind(wx.EVT_BUTTON, self.OnSearch)
         self.translationSizer.Add(self.searchButton, 0, wx.ALL, 3)
     
@@ -117,12 +118,12 @@ class PlingoFrame(PlingoFrameGenerated):
         #static imgs
         for s in ["finished", "ready", "stopped"]:
             self.status_icons[s] = wx.StaticBitmap(self, wx.ID_ANY, 
-                resources.load_icon("search_"+s))
+                self.get_bmp("search_"+s))
         
         #animations
         for s in ["started"]:
             self.status_icons[s] = wx.animate.AnimationCtrl(self, wx.ID_ANY,
-                resources.load_icon("search_"+s, wx.animate.Animation))
+                self.get_animation("search_"+s))
             self.status_icons[s].Play()
             
         flags = wx.ALIGN_CENTER_VERTICAL
@@ -156,6 +157,15 @@ class PlingoFrame(PlingoFrameGenerated):
     #================================================================================
     # Helper functions
     #================================================================================
+    
+    #Shortcut functions for wx.ArtProvider
+    def get_bmp(self, art_name_or_id):
+        return wx.ArtProvider.GetBitmap(art_name_or_id, wx.ART_MENU, (16,16))
+    
+    def get_animation(self, name):
+        #Relays on ArtProvider implementing this method!
+        return artprovider.get_animation(name)
+    
     
     def set_next_status_timed(self, delay, status, msg=None):
         self.next_status = {}
