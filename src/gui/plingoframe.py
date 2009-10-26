@@ -64,8 +64,8 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def init_gui_plugin_toolbar(self):
         interfacesToolbar = wx.ToolBar(self, -1)
-        interfacesToolbar.AddLabelTool(wx.ID_ANY, '', resources.load_icon('plugin'))
-        interfacesToolbar.AddLabelTool(wx.ID_ANY, '', resources.load_icon('plugin'))
+        interfacesToolbar.AddCheckLabelTool(wx.ID_ANY, '', resources.load_icon('plugin'))
+        interfacesToolbar.AddCheckLabelTool(wx.ID_ANY, '', resources.load_icon('plugin'))
         interfacesToolbar.Realize()
         self.basicInterfaceSizer.Insert(0, interfacesToolbar)
         self.interfacesToolbar = interfacesToolbar   
