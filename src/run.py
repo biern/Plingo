@@ -5,7 +5,6 @@ Created on 2009-10-18
 '''
 import wx, sys
 
-import resources
 from gui.plingoframe import PlingoFrame
 
 def start_app():
