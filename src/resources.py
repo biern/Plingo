@@ -7,9 +7,10 @@ import wx, os
 
 ICONS_PATH = os.path.join(os.path.dirname(__file__), "../icons/")
 LOADED_RESOURCES = {}
+#TODO: Switch to wx.ArtProvider for native icons
 
- # to make life easier
- # note that you don't have to use that mappings
+# mappings to make life easier
+# note that you don't have to use that mappings
 ICON_NAMES_MAPPING = {
     "properties" : "cog.png",
     "help" : "help.png",
@@ -17,6 +18,10 @@ ICON_NAMES_MAPPING = {
     "switch_mode" : "text_linespacing.png",
     "plugin": "plugin.png",
     "search": "find.png",
+    "search_started": "anim/ajax-loader.gif",
+    "search_stopped": "plugin.png",
+    "search_ready":"plugin.png",
+    "search_finished":"plugin.png",
     }
 
 def init_resources():
