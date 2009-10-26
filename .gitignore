@@ -1,4 +1,6 @@
-#kate backups
+#backups
 *~
 #python bytecode
 *.pyc
+#dolphin directory view
+.directory
