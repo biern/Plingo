@@ -8,7 +8,6 @@ import wx, sys
 from gui.plingoframe import PlingoFrame
 
 def start_app():
-    resources.init_resources()
     plingo = wx.PySimpleApp(0)
     wx.InitAllImageHandlers()
     plingoFrame = PlingoFrame(None, -1, "")
