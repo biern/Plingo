@@ -105,7 +105,9 @@ class PlingoFrame(PlingoFrameGenerated):
         self.translationSizer.Add(self.searchButton, 0, wx.ALL, 3)
     
     def init_gui_status(self):
-        #static
+        font = wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL)
+        self.statusText.SetFont(font)
+        #static imgs
         for s in ["finished", "ready", "stopped"]:
             self.status_icons[s] = wx.StaticBitmap(self, wx.ID_ANY, 
                 resources.load_icon("search_"+s))
