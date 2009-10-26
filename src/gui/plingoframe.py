@@ -4,7 +4,7 @@ Created on 2009-10-15
 @author: marcin
 '''
 
-import wx, time
+import wx, time, wx.animate
 from wx.py.shell import ShellFrame
 from wx.py.filling import FillingFrame
 
@@ -14,11 +14,17 @@ import resources
 #TODO: Unicode support in textCtrls!
 
 class PlingoFrame(PlingoFrameGenerated):
+    messages  = {
+                         "search_started": "searching...",
+                         "search_stopped": "stopped",
+                         "search_finished": "finished",
+                         "search_ready":"ready",
+                         }
     #TODO: Make value below adjustable in properties
     auto_search_delay = 1.5
     def __init__(self, *args, **kwargs):
         super(PlingoFrame, self).__init__(*args, **kwargs)
-        self.debug = kwargs.get('debug', False)
+        self.debug = kwargs.get('debug', True)
         self.init_vars()
         self.init_gui()
         self.init_input_widgets()
@@ -26,9 +32,11 @@ class PlingoFrame(PlingoFrameGenerated):
         self.init_shortcuts()
     
     def init_vars(self):
+        self.status_icons = {}
         self.input_widget = None
         self.mode = "single"
-        self.search_done = True
+        self.already_searching = True
+        self.next_status = None
         self.letter_entered_timer = 0
     
     def init_frame_events(self):
@@ -39,14 +47,21 @@ class PlingoFrame(PlingoFrameGenerated):
         pass
     
     def init_gui(self):
+        self.init_searchctrl()
         self.init_gui_plugin_toolbar()
         self.init_gui_tools()
         self.init_gui_wordlist()
+        self.init_gui_languages()
         if self.debug: self.init_gui_debug_panels()
         self.init_gui_search_buttons()
+        self.init_gui_status()
         self.Fit()
         self.SetMinSize(self.GetSize())
-     
+    
+    def init_searchctrl(self):
+        #self.searchCtrl.SetStyle bla bla bla
+        pass
+    
     def init_gui_plugin_toolbar(self):
         interfacesToolbar = wx.ToolBar(self, -1)
         interfacesToolbar.AddLabelTool(wx.ID_ANY, '', resources.load_icon('plugin'))
@@ -76,6 +91,10 @@ class PlingoFrame(PlingoFrameGenerated):
         self.wordList.InsertColumn(0, "input")
         self.wordList.InsertColumn(1, "translation")
     
+    def init_gui_languages(self):
+        #TODO: Load resources for BitmapComboBox
+        pass
+    
     def init_gui_debug_panels(self):
         self.debugButton.Show()
         #More stuff may go here later
@@ -85,11 +104,27 @@ class PlingoFrame(PlingoFrameGenerated):
         self.searchButton.Bind(wx.EVT_BUTTON, self.OnSearch)
         self.translationSizer.Add(self.searchButton, 0, wx.ALL, 3)
     
-    def init_gui_status_icon(self):
-        #TODO: create it and hide
-        pass
+    def init_gui_status(self):
+        #static
+        for s in ["finished", "ready", "stopped"]:
+            self.status_icons[s] = wx.StaticBitmap(self, wx.ID_ANY, 
+                resources.load_icon("search_"+s))
+        
+        #animations
+        for s in ["started"]:
+            self.status_icons[s] = wx.animate.AnimationCtrl(self, wx.ID_ANY,
+                resources.load_icon("search_"+s, wx.animate.Animation))
+            self.status_icons[s].Play()
+            
+        flags = wx.ALIGN_CENTER_VERTICAL
+        for widget in self.status_icons.values():
+            self.statusIconSizer.Add(widget, 0, flags)
+        
+        self.hide_status_icons()
+        self.search_ready()
     
     def init_input_widgets(self):
+        #TODO: use searchCtrl!
         self.hide_input_widgets()
         self.init_singleline_mode()
     
@@ -113,6 +148,15 @@ class PlingoFrame(PlingoFrameGenerated):
     # Helper functions
     #================================================================================
     
+    def set_next_status_timed(self, delay, status, msg=None):
+        self.next_status = {}
+        self.next_status['status'] = status
+        self.next_status['msg'] = msg
+        self.next_status['time'] = time.time() + delay
+    
+    def hide_status_icons(self, hide=True):
+        self.statusIconSizer.ShowItems(not hide)
+        
     def hide_input_widgets(self):
         self.searchCtrl.Hide()
         self.searchCtrlMulti.Hide()
@@ -132,15 +176,65 @@ class PlingoFrame(PlingoFrameGenerated):
     def search(self):
         if not self.get_input_text(): return
         print("Searching for \"{0}\"".format(self.get_input_text()))
-        self.search_done = True
+        #search done shoud be returned by plugin?
+        self.already_searching = True
+        self.search_started()
     
-    def start_search(self):
-        #Change status icon disable/hide buttons?
-        pass
+    def stop_search(self):
+        self.already_searching = False
     
-    def finish_search(self):
-        #Change search status to finished
-        pass
+    def set_status(self, msg=None, search_status=None):
+        """
+        At least 1 arg is required. This function calls 'search_*' functions if available
+        """
+        setter = getattr(self, 'search_' + search_status, None)
+        if setter:
+            setter(msg)
+        else:
+            self.__set_status(msg, search_status)
+
+    def search_started(self, msg=None):
+        """ 
+        Works like set_status' callback but can be called instead of it, 
+        should always call __set_status
+        """            
+        self.__set_status(msg, "started")
+        self.set_next_status_timed(3, 'finished')
+    
+    def search_finished(self, msg=None):
+        self.__set_status(msg, "finished")
+        self.set_next_status_timed(3, 'ready')
+    
+    def search_stopped(self, msg=None):
+        self.__set_status(msg, "stopped")
+    
+    def search_ready(self, msg=None):
+        self.__set_status(msg, "ready")
+    
+    def __set_status(self, msg=None, search_status=None):
+        """
+        Requires at least 1 arg (will set blank status otherwise)
+        Use search_* methods instead of this one in plugins!
+        """
+        self.next_status = None
+        self.hide_status_icons()
+        try:
+            self.status_icons[search_status].Show()
+        except KeyError:
+            pass
+                
+        default_msg = ""
+        if search_status:
+            default_msg = self.messages.get("search_"+search_status, "")
+            
+        if not msg: 
+            msg = default_msg
+        elif msg.startswith("+"): 
+            msg = default_msg + msg
+            
+        self.statusText.SetLabel(msg)
+        self.Layout()
+
         
     #================================================================================
     # Event handlers   
@@ -156,10 +250,10 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def OnLetterEntered(self, evt):
         if len(self.get_input_text()):
-            self.search_done = False
+            self.already_searching = False
             self.letter_entered_timer = time.time()
         else:
-            self.search_done = True
+            self.already_searching = True
     
     def OnDebug(self, evt):
         frame = ShellFrame(parent=self)
@@ -168,7 +262,11 @@ class PlingoFrame(PlingoFrameGenerated):
         frame.Show()
         
     def OnIdle(self, evt):
-        if self.search_done: return
-        if time.time() - self.letter_entered_timer >= self.auto_search_delay:
-            print "auto search!"
-            self.search()
+        if not self.already_searching:
+            if time.time() - self.letter_entered_timer >= self.auto_search_delay:
+                print "auto search!"
+                self.search()
+        
+        if self.next_status:
+            if time.time() - self.next_status['time'] >= 0:
+                self.set_status(self.next_status['msg'], self.next_status['status'])

@@ -23,6 +23,7 @@ class PlingoFrameGenerated(wx.Frame):
         self.searchCtrlMulti = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE)
         self.translateFromChoice = wx.Choice(self, -1, choices=["english", "polish"])
         self.translateToChoice = wx.Choice(self, -1, choices=["polish", "english"])
+        self.statusText = wx.StaticText(self, -1, "status message")
         self.wordList = wx.ListCtrl(self, -1, style=wx.LC_REPORT|wx.LC_ALIGN_LEFT|wx.LC_SINGLE_SEL|wx.LC_SORT_ASCENDING|wx.SUNKEN_BORDER)
 
         self.__set_properties()
@@ -50,12 +51,17 @@ class PlingoFrameGenerated(wx.Frame):
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         menuSizer = wx.BoxSizer(wx.VERTICAL)
         basicInterfaceSizer = wx.BoxSizer(wx.VERTICAL)
+        statusSizer = wx.BoxSizer(wx.HORIZONTAL)
+        statusIconSizer = wx.BoxSizer(wx.HORIZONTAL)
         translationSizer = wx.BoxSizer(wx.HORIZONTAL)
         basicInterfaceSizer.Add(self.searchCtrl, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 3)
         basicInterfaceSizer.Add(self.searchCtrlMulti, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 3)
         translationSizer.Add(self.translateFromChoice, 1, 0, 3)
         translationSizer.Add(self.translateToChoice, 1, wx.LEFT, 3)
         basicInterfaceSizer.Add(translationSizer, 1, wx.ALL|wx.EXPAND, 3)
+        statusSizer.Add(self.statusText, 0, wx.RIGHT|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 7)
+        statusSizer.Add(statusIconSizer, 1, wx.ALL|wx.EXPAND, 3)
+        basicInterfaceSizer.Add(statusSizer, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 3)
         sizer_3.Add(basicInterfaceSizer, 1, wx.EXPAND, 0)
         sizer_3.Add(menuSizer, 0, wx.EXPAND, 0)
         mainSizer.Add(sizer_3, 0, wx.EXPAND, 0)
@@ -68,6 +74,7 @@ class PlingoFrameGenerated(wx.Frame):
         self.basicInterfaceSizer = basicInterfaceSizer
         self.menuSizer = menuSizer
         self.translationSizer = translationSizer
+        self.statusIconSizer = statusIconSizer
 
     def OnTextSubmited(self, event): # wxGlade: PlingoFrameGenerated.<event_handler>
         print "Event handler `OnTextSubmited' not implemented!"
