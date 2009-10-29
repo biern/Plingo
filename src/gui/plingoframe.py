@@ -61,6 +61,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.init_gui_wordlist()
         self.init_gui_languages()
         if self.debug: self.init_gui_debug_panels()
+        self.init_gui_language_choices()
         self.init_gui_search_buttons()
         self.init_gui_status()
         self.Fit()
@@ -107,10 +108,16 @@ class PlingoFrame(PlingoFrameGenerated):
         self.debugButton.Show()
         #More stuff may go here later
     
+    def init_gui_language_choices(self):
+        self.translateFromCombo = wx.combo.BitmapComboBox(self, style=wx.CB_READONLY)
+        self.translateToCombo = wx.combo.BitmapComboBox(self, style=wx.CB_READONLY)
+        self.translationSizer.Insert(0, self.translateFromCombo, 1, wx.ALL, 3)
+        self.translationSizer.Insert(1, self.translateToCombo, 1, wx.ALL, 3)
+    
     def init_gui_search_buttons(self):
         self.searchButton = wx.BitmapButton(self, wx.ID_ANY, self.get_bmp(wx.ART_FIND))
         self.searchButton.Bind(wx.EVT_BUTTON, self.OnSearch)
-        self.translationSizer.Add(self.searchButton, 0, wx.ALL, 3)
+        self.translationSizer.Insert(2, self.searchButton, 0, wx.ALL, 3)
     
     def init_gui_status(self):
         font = wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL)
