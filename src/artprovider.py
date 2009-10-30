@@ -21,6 +21,7 @@ class PlingoArtProvider(wx.ArtProvider):
         "debug" : "bricks.png",
         "switch_mode" : "text_linespacing.png",
         "plugin": "plugin.png",
+        "icon" : "plingo.png",
     }
     anim_to_load = {
         "search_started": "anim/ajax-loader.gif",
