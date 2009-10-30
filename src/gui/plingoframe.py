@@ -5,12 +5,16 @@ Created on 2009-10-15
 @author: marcin
 '''
 
-import wx, time, wx.animate
+import time
+import operator
+import wx, wx.animate
+from wx.lib.art import flagart, img2pyartprov
 from wx.py.shell import ShellFrame
 from wx.py.filling import FillingFrame
 
 from generated.plingoframe import PlingoFrameGenerated
 import artprovider
+import languages
 
 #TODO: Unicode support in textCtrls!
 
@@ -34,6 +38,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.debug = kwargs.get('debug', True)
         wx.ArtProvider.Push(artprovider.PlingoArtProvider())
         self.init_vars()
+        self.init_languages()
         self.init_gui()
         self.init_input_widgets()
         self.init_frame_events()
@@ -47,6 +52,12 @@ class PlingoFrame(PlingoFrameGenerated):
         self.next_status = None
         self.letter_entered_timer = 0
     
+    def init_languages(self):
+        """
+        Inits all translation languages with flags available on the system 
+        """
+        self.languages = languages.get_languages()
+    
     def init_frame_events(self):
         self.Bind(wx.EVT_IDLE, self.OnIdle)
     
@@ -59,7 +70,6 @@ class PlingoFrame(PlingoFrameGenerated):
         self.init_gui_plugin_toolbar()
         self.init_gui_tools()
         self.init_gui_wordlist()
-        self.init_gui_languages()
         if self.debug: self.init_gui_debug_panels()
         self.init_gui_language_choices()
         self.init_gui_search_buttons()
@@ -98,22 +108,22 @@ class PlingoFrame(PlingoFrameGenerated):
     def init_gui_wordlist(self):
         #TODO: Hide it before search?
         self.wordList.populate(sample_wordlist)
-        
-    
-    def init_gui_languages(self):
-        #TODO: Load resources for BitmapComboBox
-        pass
-    
+            
     def init_gui_debug_panels(self):
         self.debugButton.Show()
         #More stuff may go here later
     
     def init_gui_language_choices(self):
+        FlagArtProvider = img2pyartprov.Img2PyArtProvider(flagart, artIdPrefix='wx.ART_')
+        wx.ArtProvider.Push(FlagArtProvider)
         self.translateFromCombo = wx.combo.BitmapComboBox(self, style=wx.CB_READONLY)
         self.translateToCombo = wx.combo.BitmapComboBox(self, style=wx.CB_READONLY)
         self.translationSizer.Insert(0, self.translateFromCombo, 1, wx.ALL, 3)
         self.translationSizer.Insert(1, self.translateToCombo, 1, wx.ALL, 3)
-    
+        #Just for testing:
+        self.set_languages_to(self.languages.keys())
+        self.set_languages_from(self.languages.keys())
+
     def init_gui_search_buttons(self):
         self.searchButton = wx.BitmapButton(self, wx.ID_ANY, self.get_bmp(wx.ART_FIND))
         self.searchButton.Bind(wx.EVT_BUTTON, self.OnSearch)
@@ -173,7 +183,64 @@ class PlingoFrame(PlingoFrameGenerated):
         #Relays on ArtProvider implementing this method!
         return artprovider.get_animation(name)
     
+    def set_languages_from(self, codes_list):
+        """ 
+        Codes list element may be a string matching existing language code
+        or tuple defining new language: (code, <name, <flag_bmp>>).
+        if flag_bmp is not present, app will try to determine flag from
+        language code. Same with 'name'.
+        """
+        for line in self.parse_codes_list(codes_list):
+            self.translateFromCombo.Append(*line)
     
+    def set_languages_to(self, codes_list):
+        """
+        See "set_languages_from"
+        """ 
+        for line in self.parse_codes_list(codes_list):
+            self.translateToCombo.Append(*line)
+    
+    def parse_codes_list(self, codes_list):
+        """
+        Returns sorted list of (name, bmp, country_code) that is ready to fill
+        BitmapComboBox. Codes list is the same format as in set_languages_from
+        """
+        result = []
+        lang = []
+        for value in codes_list:
+            #If value is language code then
+            if type(value) in (unicode, str):
+                #If value is shorter code form, get full one
+                parsed_code = languages.parse_country_code(value)
+                try:
+                    lang = self.languages[parsed_code]
+                except KeyError:
+                    print('Unknown language code "{0}", ({1} originally)'.format(parsed_code, value))
+                    lang = value
+                
+                result.append([lang, languages.flag_for(parsed_code), value])
+                
+            else:
+                code = value[0]
+                parsed_code = languages.parse_country_code(code)
+                name = None
+                #Get name from tuple if possible, else get it from code
+                if len(value) > 1:
+                    name = value[1]
+                else:
+                    try:
+                        name = self.languages[parsed_code]
+                    except KeyError:
+                        name = code
+                
+                bmp = languages.flag_for(parsed_code)
+                if len(value) > 2:
+                    bmp = wx.Bitmap(value[2])
+                
+                result.append([name, bmp, code])
+        
+        return sorted(result, key=operator.itemgetter(2)) 
+
     def set_next_status_timed(self, delay, status, msg=None):
         self.next_status = {}
         self.next_status['status'] = status
