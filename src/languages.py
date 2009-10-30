@@ -31,7 +31,7 @@ def build_languages():
     country_mappings = langlistctrl.BuildLanguageCountryMapping()
     for name, lid in zip(*lrl[1:]):
         #Can't save wx bmps in pickle
-        result[country_mappings[lid]] = (name, lid)
+        result[country_mappings[lid]] = name
     
     file = open(FILENAME, 'w')
     pickle.dump(result, file)
@@ -43,11 +43,7 @@ def generate_languages_info_file(data):
     file = open(INFO_FILENAME, 'w')
     lines = []
     for k in sorted(data.keys()):
-        lines.append("{0:6} : {1}\n".format(k, data[k][0]))
+        lines.append("{0:6} : {1}\n".format(k, data[k]))
         
     file.writelines(lines)
     file.close()
-    
-    
-    
-    
