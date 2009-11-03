@@ -13,6 +13,7 @@ from wx.py.shell import ShellFrame
 from wx.py.filling import FillingFrame
 
 from generated.plingoframe import PlingoFrameGenerated
+from taskbar import PlingoTaskbar
 import artprovider
 import languages
 
@@ -38,11 +39,13 @@ class PlingoFrame(PlingoFrameGenerated):
         self.debug = kwargs.get('debug', True)
         wx.ArtProvider.Push(artprovider.PlingoArtProvider())
         self.init_vars()
+        self.init_icon()
         self.init_languages()
         self.init_gui()
         self.init_input_widgets()
         self.init_frame_events()
         self.init_shortcuts()
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
     
     def init_vars(self):
         self.status_icons = {}
@@ -51,6 +54,15 @@ class PlingoFrame(PlingoFrameGenerated):
         self.disable_autosearch = True
         self.next_status = None
         self.letter_entered_timer = 0
+    
+    def init_icon(self):
+        bmp = self.get_bmp("icon")
+        #Transparency seems not to work with gtk
+        bmp.SetMask(wx.Mask(bmp, wx.WHITE))
+        self.icon = wx.EmptyIcon()
+        self.icon.CopyFromBitmap(bmp)
+        self.SetIcon(self.icon)
+
     
     def init_languages(self):
         """
@@ -74,6 +86,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.init_gui_language_choices()
         self.init_gui_search_buttons()
         self.init_gui_status()
+        self.init_gui_taskbar()
         self.Fit()
         self.SetMinSize(self.GetSize())
     
@@ -149,6 +162,9 @@ class PlingoFrame(PlingoFrameGenerated):
         
         self.hide_status_icons()
         self.search_ready()
+    
+    def init_gui_taskbar(self):
+        self.taskbar = PlingoTaskbar(self)
     
     def init_input_widgets(self):
         #TODO: use searchCtrl!
@@ -363,3 +379,22 @@ class PlingoFrame(PlingoFrameGenerated):
         if self.next_status:
             if time.time() - self.next_status['time'] >= 0:
                 self.set_status(self.next_status['msg'], self.next_status['status'])
+
+
+    def OnClose(self, evt):
+        #TODO: Check if settings don't allow to iconize app
+        self.hide_to_taskbar()
+
+    def hide_to_taskbar(self):
+        #TODO: Check if settings don't allow to iconize app
+        self.Hide()
+        self.Iconize(True)
+        
+    def show_and_rise(self):
+        self.Show()
+        self.Iconize(False)
+        self.Raise()
+        
+    def real_exit(self):
+        wx.GetApp().Exit()
+
