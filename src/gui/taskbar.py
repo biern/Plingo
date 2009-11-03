@@ -24,11 +24,14 @@ class PlingoTaskbar(wx.TaskBarIcon):
     
     def init_menu(self):
         tm = self.menu = wx.Menu()
+        #Loading resources
+        self.hide_bmp = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_MENU, (16,16))
+        self.show_bmp = wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16,16))
         #Creating menu items
         quit = wx.MenuItem(tm, wx.ID_ANY, "Exit")
         quit.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_QUIT, wx.ART_MENU, (16,16)))
-        show = wx.MenuItem(tm, wx.ID_ANY, "Show")
-        show.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16,16)))
+        self.m_show = show = wx.MenuItem(tm, wx.ID_ANY, "Show")
+        show.SetBitmap(self.hide_bmp)
         #Appending them
         tm.AppendItem(show)
         tm.AppendSeparator()
@@ -42,10 +45,23 @@ class PlingoTaskbar(wx.TaskBarIcon):
 
             
     def OnMenu(self, evt):
+        #TODO: Find a way to refresh menu items' bmp's
+        if not self.app.IsIconized():
+            self.menu.SetLabel(self.m_show.GetId(), "Hide")
+            self.m_show.SetBitmap(self.hide_bmp)
+        else:
+            self.menu.SetLabel(self.m_show.GetId(), "Show")
+            self.m_show.SetBitmap(self.show_bmp)
+            
         self.PopupMenu(self.menu)
         
     def OnQuit(self, evt):
         self.app.real_exit()
         
     def OnShow(self, evt):
-        self.app.show_and_rise()
+        #Or hide as well
+        if self.app.IsIconized():
+            self.app.show_and_rise()
+        else:
+            self.app.hide_to_taskbar()
+
