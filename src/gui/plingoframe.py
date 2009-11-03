@@ -190,6 +190,20 @@ class PlingoFrame(PlingoFrameGenerated):
     #================================================================================
     # Helper functions
     #================================================================================
+
+    def hide_to_taskbar(self):
+        #TODO: Check if settings don't allow to iconize app
+        self.Hide()
+        self.Iconize(True)
+        
+    def show_and_rise(self):
+        self.Show()
+        self.Iconize(False)
+        self.Raise()
+        self.get_input_widget().SetFocus()
+        
+    def real_exit(self):
+        wx.GetApp().Exit()
     
     #Shortcut functions for wx.ArtProvider
     def get_bmp(self, art_name_or_id):
@@ -275,6 +289,12 @@ class PlingoFrame(PlingoFrameGenerated):
             self.init_multiline_mode()
         else:
             self.init_singleline_mode()
+    
+    def get_input_widget(self):
+        if self.mode == 'single':
+            return self.searchCtrl
+        else:
+            return self.searchCtrlMulti
     
     def get_input_text(self):
         if self.mode == "single":
@@ -384,17 +404,4 @@ class PlingoFrame(PlingoFrameGenerated):
     def OnClose(self, evt):
         #TODO: Check if settings don't allow to iconize app
         self.hide_to_taskbar()
-
-    def hide_to_taskbar(self):
-        #TODO: Check if settings don't allow to iconize app
-        self.Hide()
-        self.Iconize(True)
-        
-    def show_and_rise(self):
-        self.Show()
-        self.Iconize(False)
-        self.Raise()
-        
-    def real_exit(self):
-        wx.GetApp().Exit()
 
