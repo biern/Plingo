@@ -1,10 +1,9 @@
 # Plingo 
 
-	Fast and easy to use wxPython translator application.
-	Plingo is still in development, its main features will include:
-	
-	* All translations will be done by plugin system with access to rich API
-	* Shortcuts! You should never need to take your hands off the keyboard :-)
-	
+Fast and easy to use wxPython translator application.
+Plingo is still in development, its main features will include:
+
+* All translations will be done by plugin system with access to rich API
+* Shortcuts! You should never need to take your hands off the keyboard :-)
 
 Copyright (C) 2010 Marcin Biernat <biern.m@gmail.com>
