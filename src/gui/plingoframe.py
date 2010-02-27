@@ -62,8 +62,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.icon = wx.EmptyIcon()
         self.icon.CopyFromBitmap(bmp)
         self.SetIcon(self.icon)
-
-    
+ 
     def init_languages(self):
         """
         Inits all translation languages with flags available on the system 
@@ -374,6 +373,7 @@ class PlingoFrame(PlingoFrameGenerated):
     #================================================================================
     # Event handlers   
     #================================================================================
+    
     def OnSearch(self, evt):
         self.search()
         
@@ -405,7 +405,6 @@ class PlingoFrame(PlingoFrameGenerated):
         if self.next_status:
             if time.time() - self.next_status['time'] >= 0:
                 self.set_status(self.next_status['msg'], self.next_status['status'])
-
 
     def OnClose(self, evt):
         #TODO: Check if settings don't allow to iconize app
