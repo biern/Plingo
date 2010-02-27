@@ -420,5 +420,5 @@ class PlingoFrame(PlingoFrameGenerated):
 
     def OnClose(self, evt):
         #TODO: Check if settings don't allow to iconize app
-        self.hide_to_taskbar()
+        self.minimize()
 
