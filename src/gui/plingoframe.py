@@ -73,6 +73,10 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def init_frame_events(self):
         self.Bind(wx.EVT_IDLE, self.OnIdle)
+        self.searchCtrl.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
+        self.searchCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnFocusLost)
+        self.searchCtrlMulti.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
+        self.searchCtrlMulti.Bind(wx.EVT_KILL_FOCUS, self.OnFocusLost)
     
     def init_shortcuts(self):
         #Global shortcuts:
@@ -212,6 +216,7 @@ class PlingoFrame(PlingoFrameGenerated):
                 and cb_text != self.get_input_text():
             self.get_input_widget().Value = cb_text
             self.search()
+            self.set_last_clipboard_text()
     
     def set_last_clipboard_text(self):
         self.last_clipboard_content = self.get_clipboard_text()
@@ -460,4 +465,14 @@ class PlingoFrame(PlingoFrameGenerated):
     def OnClose(self, evt):
         #TODO: Check if settings don't allow to iconize app
         self.minimize()
-
+        
+    def OnFocus(self, evt):
+        #FIXME: These functions are actually called not when whole frame
+        # gets focus, but only the input_widget!
+        #TODO: Option to enable/disable that search
+        self.try_clipboard_search()
+        
+    def OnFocusLost(self, evt):
+        #FIXME: These functions are actually called not when whole frame
+        # gets focus, but only the input_widget!
+        self.set_last_clipboard_text()
