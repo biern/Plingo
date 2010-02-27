@@ -181,6 +181,7 @@ class PlingoFrame(PlingoFrameGenerated):
         #TODO: use searchCtrl!
         self.hide_input_widgets()
         self.init_singleline_mode()
+        self.set_last_clipboard_text()
     
     def init_multiline_mode(self):
         self.hide_input_widgets()
@@ -201,6 +202,44 @@ class PlingoFrame(PlingoFrameGenerated):
     #================================================================================
     # Helper functions
     #================================================================================
+    
+    def try_clipboard_search(self):
+        #Replace input with copied text only if it is different 
+        # than the last one
+        #TODO: Add option to enable/disable this feature
+        cb_text = self.get_clipboard_text()
+        if cb_text and cb_text != self.last_clipboard_content\
+                and cb_text != self.get_input_text():
+            self.get_input_widget().Value = cb_text
+            self.search()
+    
+    def set_last_clipboard_text(self):
+        self.last_clipboard_content = self.get_clipboard_text()
+    
+    def get_clipboard_text(self):
+        """
+        Returns string stored in clipboard only if it passes the 
+        'valid_clipboard_string' function. If it was impossible to get one
+        or test was not successful, then False is returned.
+        """
+        if not wx.TheClipboard.IsOpened():
+            wx.TheClipboard.Open()
+            do = wx.TextDataObject()
+            success = wx.TheClipboard.GetData(do)
+            text = do.GetText()
+            #TODO: move valid_clipboard_string from app to plugin
+            result = success and self.valid_clipboard_string(text) and text 
+            wx.TheClipboard.Close()
+            return result
+        
+        return False
+    
+    def valid_clipboard_string(self, string):
+        if self.mode == 'single':
+            return string.strip().find(' ') < 0
+        else:
+            #TODO: Add a setting for max default len
+            return len(string) < 255
     
     def toggle_minimize(self):
         if self.IsIconized():
