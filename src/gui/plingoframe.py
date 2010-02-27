@@ -36,6 +36,7 @@ class PlingoFrame(PlingoFrameGenerated):
                          }
     #TODO: Make value below adjustable in properties
     auto_search_delay = 1.5
+    auto_clipboard_search_delay = 1
     def __init__(self, *args, **kwargs):
         super(PlingoFrame, self).__init__(*args, **kwargs)
         self.debug = kwargs.get('debug', True)
@@ -56,6 +57,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.disable_autosearch = True
         self.next_status = None
         self.letter_entered_timer = 0
+        self.last_auto_clipboard_search = 0
     
     def init_icon(self):
         bmp = self.get_bmp("icon")
@@ -461,6 +463,11 @@ class PlingoFrame(PlingoFrameGenerated):
         if self.next_status:
             if time.time() - self.next_status['time'] >= 0:
                 self.set_status(self.next_status['msg'], self.next_status['status'])
+                
+        #TODO: Option to enable/disable that
+        if time.time() - self.last_auto_clipboard_search \
+            >= self.auto_clipboard_search_delay:
+            self.try_clipboard_search()
 
     def OnClose(self, evt):
         #TODO: Check if settings don't allow to iconize app
