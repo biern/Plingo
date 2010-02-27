@@ -5,8 +5,10 @@ Created on 2009-10-15
 @author: marcin
 '''
 
+import os
 import time
 import operator
+import keybinder
 import wx, wx.animate
 from wx.lib.art import flagart, img2pyartprov
 from wx.py.shell import ShellFrame
@@ -73,8 +75,18 @@ class PlingoFrame(PlingoFrameGenerated):
         self.Bind(wx.EVT_IDLE, self.OnIdle)
     
     def init_shortcuts(self):
-        #TODO: shortcuts
-        pass
+        #Global shortcuts:
+        if os.name == "nt":
+            show_id = wx.NewId()
+            #TODO: RegisterHotKey works only on win, add sth for linux
+            self.app.RegisterHotKey(show_id, 
+                wx.MOD_CONTROL | wx.MOD_ALT, ord('P'))
+            self.Bind(wx.EVT_HOTKEY, self.toggle_show_hide, id=show_id)
+        else:
+            keybinder.bind("<Ctrl><Alt>p", 
+                lambda: wx.CallAfter(self.toggle_show_hide))
+        #TODO: App shortcuts for switching between widgets, plugins, modes
+        #  quitting and just everything else :-)
     
     def init_gui(self):
         self.init_searchctrl()
