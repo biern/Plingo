@@ -190,7 +190,13 @@ class PlingoFrame(PlingoFrameGenerated):
     #================================================================================
     # Helper functions
     #================================================================================
-
+    
+    def toggle_show_hide(self):
+        if self.IsIconized():
+            self.show_and_rise()
+        else:
+            self.hide_to_taskbar()
+    
     def hide_to_taskbar(self):
         #TODO: Check if settings don't allow to iconize app
         self.Hide()
