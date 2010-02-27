@@ -59,4 +59,4 @@ class PlingoTaskbar(wx.TaskBarIcon):
         
     def OnShow(self, evt):
         #Or hide as well
-        self.app.toggle_show_hide()
+        self.app.toggle_minimize()

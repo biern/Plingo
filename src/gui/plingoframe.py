@@ -81,10 +81,10 @@ class PlingoFrame(PlingoFrameGenerated):
             #TODO: RegisterHotKey works only on win, add sth for linux
             self.app.RegisterHotKey(show_id, 
                 wx.MOD_CONTROL | wx.MOD_ALT, ord('P'))
-            self.Bind(wx.EVT_HOTKEY, self.toggle_show_hide, id=show_id)
+            self.Bind(wx.EVT_HOTKEY, self.toggle_minimize, id=show_id)
         else:
             keybinder.bind("<Ctrl><Alt>p", 
-                lambda: wx.CallAfter(self.toggle_show_hide))
+                lambda: wx.CallAfter(self.toggle_minimize))
         #TODO: App shortcuts for switching between widgets, plugins, modes
         #  quitting and just everything else :-)
     
@@ -202,18 +202,18 @@ class PlingoFrame(PlingoFrameGenerated):
     # Helper functions
     #================================================================================
     
-    def toggle_show_hide(self):
+    def toggle_minimize(self):
         if self.IsIconized():
-            self.show_and_rise()
+            self.unminimize()
         else:
-            self.hide_to_taskbar()
+            self.minimize()
     
-    def hide_to_taskbar(self):
+    def minimize(self):
         #TODO: Check if settings don't allow to iconize app
         self.Hide()
         self.Iconize(True)
         
-    def show_and_rise(self):
+    def unminimize(self):
         self.Show()
         self.Iconize(False)
         self.Raise()
