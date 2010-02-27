@@ -43,7 +43,6 @@ class PlingoTaskbar(wx.TaskBarIcon):
         self.Bind(wx.EVT_TASKBAR_CLICK, self.OnMenu)
         self.Bind(wx.EVT_TASKBAR_LEFT_UP, self.OnShow)
 
-            
     def OnMenu(self, evt):
         #TODO: Find a way to refresh menu items' bmp's
         if not self.app.IsIconized():
