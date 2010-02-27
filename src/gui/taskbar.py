@@ -28,7 +28,7 @@ class PlingoTaskbar(wx.TaskBarIcon):
         self.hide_bmp = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_MENU, (16,16))
         self.show_bmp = wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16,16))
         #Creating menu items
-        quit = wx.MenuItem(tm, wx.ID_ANY, "Exit")
+        self.m_quit = quit = wx.MenuItem(tm, wx.ID_ANY, "Exit")
         quit.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_QUIT, wx.ART_MENU, (16,16)))
         self.m_show = show = wx.MenuItem(tm, wx.ID_ANY, "Show")
         show.SetBitmap(self.hide_bmp)
