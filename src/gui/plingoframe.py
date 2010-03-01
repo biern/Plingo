@@ -8,6 +8,8 @@ Created on 2009-10-15
 import os
 import time
 import operator
+import string
+import logging
 import wx, wx.animate
 from wx.lib.art import flagart, img2pyartprov
 from wx.py.shell import ShellFrame
@@ -17,7 +19,7 @@ from generated.plingoframe import PlingoFrameGenerated
 from taskbar import PlingoTaskbar
 import artprovider
 import languages
-import logging
+from logger import log_call
 
 log = logging.getLogger("PlingoFrame")
 
@@ -37,6 +39,11 @@ class PlingoFrame(PlingoFrameGenerated):
                          "search_finished": "finished",
                          "search_ready":"ready",
                          }
+    log_exceptions = [
+        'get_clipboard_text', 
+        'valid_clipboard_string', 
+        'try_clipboard_search'
+    ]
     #TODO: Make value below adjustable in properties
     auto_search_delay = 1.5
     auto_clipboard_search_delay = 1
@@ -44,6 +51,7 @@ class PlingoFrame(PlingoFrameGenerated):
         super(PlingoFrame, self).__init__(*args, **kwargs)
         self.debug = kwargs.get('debug', True)
         wx.ArtProvider.Push(artprovider.PlingoArtProvider())
+        self.log_all_calls(self.debug)
         self.init_vars()
         self.init_icon()
         self.init_languages()
@@ -51,6 +59,18 @@ class PlingoFrame(PlingoFrameGenerated):
         self.init_input_widgets()
         self.init_frame_events()
         self.init_shortcuts()
+    
+    def log_all_calls(self, really=True):
+        """
+        Logs calls of all methods other than self.log_exceptions
+        if its name starts with [a-z].
+        """
+        if really:
+            for name in dir(self):
+                if name[0] in string.ascii_lowercase\
+                    and callable(getattr(self, name))\
+                    and name not in self.log_exceptions:
+                    setattr(self, name, log_call(log)(getattr(self, name)))
     
     def init_vars(self):
         self.status_icons = {}
