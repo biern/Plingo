@@ -17,6 +17,9 @@ from generated.plingoframe import PlingoFrameGenerated
 from taskbar import PlingoTaskbar
 import artprovider
 import languages
+import logging
+
+log = logging.getLogger("PlingoFrame")
 
 #TODO: Unicode support in textCtrls!
 #TODO: Add notes for writing plugins
@@ -314,7 +317,7 @@ class PlingoFrame(PlingoFrameGenerated):
                 try:
                     lang = self.languages[parsed_code]
                 except KeyError:
-                    print('Unknown language code "{0}", ({1} originally)'.format(parsed_code, value))
+                    log.debug('Unknown language code "{0}", ({1} originally)'.format(parsed_code, value))
                     lang = value
                 
                 result.append([lang, languages.flag_for(parsed_code), value])
@@ -391,7 +394,7 @@ class PlingoFrame(PlingoFrameGenerated):
         
     def search(self):
         if not self.get_input_text(): return
-        print("Searching for \"{0}\"".format(self.get_input_text()))
+        log.debug("Searching for \"{0}\"".format(self.get_input_text()))
         self.disable_autosearch = True
         self.search_started()
     
@@ -480,7 +483,7 @@ class PlingoFrame(PlingoFrameGenerated):
     def OnIdle(self, evt):
         if not self.disable_autosearch:
             if time.time() - self.letter_entered_timer >= self.auto_search_delay:
-                print "auto search!"
+                log.debug("auto search initiated")
                 self.search()
         
         if self.next_status:
