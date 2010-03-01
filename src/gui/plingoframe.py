@@ -219,7 +219,6 @@ class PlingoFrame(PlingoFrameGenerated):
         cb_text = self.get_clipboard_text()
         if cb_text and cb_text != self.last_clipboard_content\
                 and cb_text != self.get_input_text():
-            #TODO: Fix to get_user_input
             self.get_input_widget().Value = cb_text
             self.search()
             self.set_last_clipboard_text()
