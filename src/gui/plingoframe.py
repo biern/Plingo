@@ -51,7 +51,6 @@ class PlingoFrame(PlingoFrameGenerated):
         self.init_input_widgets()
         self.init_frame_events()
         self.init_shortcuts()
-        self.Bind(wx.EVT_CLOSE, self.OnClose)
     
     def init_vars(self):
         self.status_icons = {}
@@ -78,6 +77,7 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def init_frame_events(self):
         self.Bind(wx.EVT_IDLE, self.OnIdle)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.searchCtrl.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
         self.searchCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnFocusLost)
         self.searchCtrlMulti.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
