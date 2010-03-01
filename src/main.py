@@ -9,7 +9,11 @@ import os.path
 from gui.plingoframe import PlingoFrame
 
 def path_to(path):
-    root_path = os.path.abspath(__file__)
+    """
+    Returns path to root app data directory
+    """
+    root_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             '../')
     return os.path.join(root_path, path) 
 
 def start_app():
