@@ -53,7 +53,7 @@ class PlingoFrame(PlingoFrameGenerated):
     def init_vars(self):
         self.status_icons = {}
         self.input_widget = None
-        self.mode = "single"
+        self.input_mode = "single"
         self.disable_autosearch = True
         self.next_status = None
         self.letter_entered_timer = 0
@@ -195,7 +195,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.searchCtrlMulti.Show()
         self.searchCtrlMulti.Value = self.get_input_text()
         self.Layout()
-        self.mode = "multi"
+        self.input_mode = "multi"
         self.search()
     
     def init_singleline_mode(self):
@@ -203,7 +203,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.searchCtrl.Show()
         self.searchCtrl.Value = self.get_input_text()
         self.Layout()
-        self.mode = "single"
+        self.input_mode = "single"
         self.search()
     
     #================================================================================
@@ -246,7 +246,7 @@ class PlingoFrame(PlingoFrameGenerated):
         return False
     
     def valid_clipboard_string(self, string):
-        if self.mode == 'single':
+        if self.input_mode == 'single':
             return string.strip().find(' ') < 0
         else:
             #TODO: Add a setting for max default len
@@ -353,9 +353,8 @@ class PlingoFrame(PlingoFrameGenerated):
         self.searchCtrl.Hide()
         self.searchCtrlMulti.Hide()
     
-    def switch_modes(self):
-        #TODO: Rename to switch_input_modes as well as 'mode' var
-        if self.mode == "single":
+    def switch_input_modes(self):
+        if self.input_mode == "single":
             self.init_multiline_mode()
         else:
             self.init_singleline_mode()
@@ -364,7 +363,7 @@ class PlingoFrame(PlingoFrameGenerated):
         """
         Returns current wx widget responsible for user input
         """
-        if self.mode == 'single':
+        if self.input_mode == 'single':
             return self.searchCtrl
         else:
             return self.searchCtrlMulti
@@ -373,7 +372,7 @@ class PlingoFrame(PlingoFrameGenerated):
         """
         Always use this method to get user input value
         """
-        if self.mode == "single":
+        if self.input_mode == "single":
             return self.searchCtrl.Value
         else:
             return self.searchCtrlMulti.Value
@@ -460,7 +459,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.search()
         
     def OnSwitchMode(self, evt):
-        self.switch_modes()
+        self.switch_input_modes()
     
     def OnTextSubmited(self, evt):
         self.search()
