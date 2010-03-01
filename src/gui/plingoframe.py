@@ -8,7 +8,6 @@ Created on 2009-10-15
 import os
 import time
 import operator
-import keybinder
 import wx, wx.animate
 from wx.lib.art import flagart, img2pyartprov
 from wx.py.shell import ShellFrame
@@ -90,6 +89,7 @@ class PlingoFrame(PlingoFrameGenerated):
                 wx.MOD_CONTROL | wx.MOD_ALT, ord('P'))
             self.Bind(wx.EVT_HOTKEY, self.toggle_minimize, id=show_id)
         else:
+            import keybinder
             keybinder.bind("<Ctrl><Alt>p", 
                 lambda: wx.CallAfter(self.toggle_minimize))
         #TODO: App hotkeys for switching between widgets, plugins, modes
