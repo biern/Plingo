@@ -20,6 +20,7 @@ import artprovider
 import languages
 
 #TODO: Unicode support in textCtrls!
+#TODO: Add notes for writing plugins
 
 sample_wordlist = {
                    "python": ['pyton', 'wąż'],
@@ -91,7 +92,7 @@ class PlingoFrame(PlingoFrameGenerated):
         else:
             keybinder.bind("<Ctrl><Alt>p", 
                 lambda: wx.CallAfter(self.toggle_minimize))
-        #TODO: App shortcuts for switching between widgets, plugins, modes
+        #TODO: App hotkeys for switching between widgets, plugins, modes
         #  quitting and just everything else :-)
     
     def init_gui(self):
@@ -210,12 +211,15 @@ class PlingoFrame(PlingoFrameGenerated):
     #================================================================================
     
     def try_clipboard_search(self):
-        #Replace input with copied text only if it is different 
-        # than the last one
+        """
+        Replace input with text in clipboard text only if it is different from
+        the last one. Then perform search 
+        """
         #TODO: Add option to enable/disable this feature
         cb_text = self.get_clipboard_text()
         if cb_text and cb_text != self.last_clipboard_content\
                 and cb_text != self.get_input_text():
+            #TODO: Fix to get_user_input
             self.get_input_widget().Value = cb_text
             self.search()
             self.set_last_clipboard_text()
@@ -229,6 +233,7 @@ class PlingoFrame(PlingoFrameGenerated):
         'valid_clipboard_string' function. If it was impossible to get one
         or test was not successful, then False is returned.
         """
+        #TODO: Reconsider current behaviour
         if not wx.TheClipboard.IsOpened():
             wx.TheClipboard.Open()
             do = wx.TextDataObject()
@@ -268,13 +273,15 @@ class PlingoFrame(PlingoFrameGenerated):
     def real_exit(self):
         wx.GetApp().Exit()
     
-    #Shortcut functions for wx.ArtProvider
+    #-Shortcut functions for wx.ArtProvider------------------------------------ 
     def get_bmp(self, art_name_or_id):
         return wx.ArtProvider.GetBitmap(art_name_or_id, wx.ART_MENU, (16,16))
     
     def get_animation(self, name):
         #Relays on ArtProvider implementing this method!
         return artprovider.get_animation(name)
+    
+    #-------------------------------------------------------------------------- 
     
     def set_languages_from(self, codes_list):
         """ 
@@ -348,47 +355,63 @@ class PlingoFrame(PlingoFrameGenerated):
         self.searchCtrlMulti.Hide()
     
     def switch_modes(self):
+        #TODO: Rename to switch_input_modes as well as 'mode' var
         if self.mode == "single":
             self.init_multiline_mode()
         else:
             self.init_singleline_mode()
     
     def get_input_widget(self):
+        """
+        Returns current wx widget responsible for user input
+        """
         if self.mode == 'single':
             return self.searchCtrl
         else:
             return self.searchCtrlMulti
     
     def get_input_text(self):
+        """
+        Always use this method to get user input value
+        """
         if self.mode == "single":
             return self.searchCtrl.Value
         else:
             return self.searchCtrlMulti.Value
-    
-    def search(self):
-        if not self.get_input_text(): return
-        print("Searching for \"{0}\"".format(self.get_input_text()))
-        #search done shoud be returned by plugin?
-        self.disable_autosearch = True
-        self.search_started()
-    
-    def stop_search(self):
-        pass
-    
+
     def set_status(self, msg=None, search_status=None):
         """
-        At least 1 arg is required. This function calls 'search_*' functions if available
+        At least 1 arg is required. This function calls 'search_*' functions
+        if available, else only __set_status is called. It is not a good idea
+        to override this method, define / redefine search_* method instead.    
         """
         setter = getattr(self, 'search_' + search_status, None)
         if setter:
             setter(msg)
         else:
             self.__set_status(msg, search_status)
-
+        
+    def search(self):
+        if not self.get_input_text(): return
+        print("Searching for \"{0}\"".format(self.get_input_text()))
+        self.disable_autosearch = True
+        self.search_started()
+    
+    def stop_search(self):
+        """
+        Kill all remaining search processes
+        """
+        #TODO: implement
+        pass
+    
     def search_started(self, msg=None):
         """ 
-        Works like set_status' callback but can be called instead of it, 
-        should always call __set_status
+        Updates gui to indicate show status and message.
+        This method is equivalent to 
+            set_status(msg=msg, search_status='started')
+        as set_status just calls this method. However, these methods
+        are preferred for clarity, easier overloading and are less
+        error prone.
         """            
         self.__set_status(msg, "started")
         self.set_next_status_timed(3, 'finished')
@@ -406,6 +429,8 @@ class PlingoFrame(PlingoFrameGenerated):
     def __set_status(self, msg=None, search_status=None):
         """
         Requires at least 1 arg (will set blank status otherwise)
+        This method is always called when using set_status or search_*
+        methods.
         Use search_* methods instead of this one in plugins!
         """
         self.next_status = None
@@ -429,7 +454,7 @@ class PlingoFrame(PlingoFrameGenerated):
 
         
     #================================================================================
-    # Event handlers   
+    # wxPython events handlers   
     #================================================================================
     
     def OnSearch(self, evt):
