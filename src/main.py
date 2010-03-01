@@ -7,6 +7,7 @@ import wx
 import os.path
 
 from gui.plingoframe import PlingoFrame
+import logger
 
 def path_to(path):
     """
@@ -26,4 +27,5 @@ def start_app():
 
 
 if __name__ == "__main__":
+    logger.setup_logging()
     start_app()
