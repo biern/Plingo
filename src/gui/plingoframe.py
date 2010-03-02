@@ -81,6 +81,7 @@ class PlingoFrame(PlingoFrameGenerated):
         self.next_status = None
         self.letter_entered_timer = 0
         self.last_auto_clipboard_search = 0
+        self.last_clipboard_content = False
     
     def init_icon(self):
         bmp = self.get_bmp("icon")
