@@ -248,6 +248,11 @@ class PlingoFrame(PlingoFrameGenerated):
     #================================================================================
     
     def try_auto_mode_switch(self):
+        """
+        Switches input modes between single / multi based on settings 
+            if enabled (self.auto_mode_switch) and user input length
+            (self.input_length_mode_switch)
+        """
         if self.auto_mode_switch:
             if len(self.get_input_text()) >= self.input_length_mode_switch:
                 if self.input_mode != 'multi':
