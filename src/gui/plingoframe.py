@@ -49,6 +49,8 @@ class PlingoFrame(PlingoFrameGenerated):
     auto_mode_switch = True
     input_length_mode_switch = 20
     auto_search_delay = 1.5
+    auto_clipboard_search = True
+    auto_clipboard_search_on_focus = True
     auto_clipboard_search_delay = 1
     def __init__(self, *args, **kwargs):
         super(PlingoFrame, self).__init__(*args, **kwargs)
@@ -538,8 +540,9 @@ class PlingoFrame(PlingoFrameGenerated):
                 self.set_status(self.next_status['msg'], self.next_status['status'])
                 
         #TODO: Option to enable/disable that
-        if time.time() - self.last_auto_clipboard_search \
-            >= self.auto_clipboard_search_delay:
+        if self.auto_clipboard_search \
+          and time.time() - self.last_auto_clipboard_search \
+          >= self.auto_clipboard_search_delay:
             self.try_clipboard_search()
 
     def OnClose(self, evt):
@@ -549,8 +552,8 @@ class PlingoFrame(PlingoFrameGenerated):
     def OnFocus(self, evt):
         #FIXME: These functions are actually called not when whole frame
         # gets focus, but only the input_widget!
-        #TODO: Option to enable/disable that search
-        self.try_clipboard_search()
+        if self.auto_clipboard_search_on_focus:
+            self.try_clipboard_search()
         
     def OnFocusLost(self, evt):
         #FIXME: These functions are actually called not when whole frame
