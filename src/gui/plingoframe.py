@@ -39,6 +39,7 @@ class PlingoFrame(PlingoFrameGenerated):
                          "search_finished": "finished",
                          "search_ready":"ready",
                          }
+    input_modes = ('single', 'multi')
     log_exceptions = [
         'get_clipboard_text', 
         'valid_clipboard_string', 
@@ -213,21 +214,31 @@ class PlingoFrame(PlingoFrameGenerated):
         self.init_singleline_mode()
         self.set_last_clipboard_text()
     
-    def init_multiline_mode(self):
+    def __init_mode(self, mode_name, widget, search=True, focus=True):
+        if not mode_name in self.input_modes:
+            raise ValueError
+        
+        #Order of this calls is pretty important to prevent infinite recursion
+        # changing input_mode should be called before setting widget value!
+        last_value = self.get_input_text()
+        self.input_mode = mode_name
         self.hide_input_widgets()
-        self.searchCtrlMulti.Show()
-        self.searchCtrlMulti.Value = self.get_input_text()
+        widget.Show()
+        widget.Value = last_value
         self.Layout()
-        self.input_mode = "multi"
-        self.search()
+        if search:
+            self.search()
+        if focus:
+            widget.SetFocus()
+            widget.SetSelection(widget.LastPosition, widget.LastPosition)
+        
     
-    def init_singleline_mode(self):
-        self.hide_input_widgets()
-        self.searchCtrl.Show()
-        self.searchCtrl.Value = self.get_input_text()
-        self.Layout()
-        self.input_mode = "single"
-        self.search()
+    def init_multiline_mode(self, search=True, focus=True):
+        self.__init_mode('multi', self.searchCtrlMulti, search)
+        
+    def init_singleline_mode(self, search=True, focus=True):
+        self.__init_mode('single', self.searchCtrl, search, focus)
+    
     
     #================================================================================
     # Helper functions
