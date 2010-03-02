@@ -247,7 +247,8 @@ class PlingoFrame(PlingoFrameGenerated):
             self.set_last_clipboard_text()
     
     def set_last_clipboard_text(self):
-        self.last_clipboard_content = self.get_clipboard_text()
+        self.last_clipboard_content = self.get_clipboard_text()\
+            or self.last_clipboard_content
     
     def get_clipboard_text(self):
         """
