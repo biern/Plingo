@@ -46,6 +46,8 @@ class PlingoFrame(PlingoFrameGenerated):
         'try_clipboard_search'
     ]
     #TODO: Make value below adjustable in properties
+    auto_mode_switch = True
+    input_length_mode_switch = 20
     auto_search_delay = 1.5
     auto_clipboard_search_delay = 1
     def __init__(self, *args, **kwargs):
@@ -245,6 +247,16 @@ class PlingoFrame(PlingoFrameGenerated):
     # Helper functions
     #================================================================================
     
+    def try_auto_mode_switch(self):
+        if self.auto_mode_switch:
+            if len(self.get_input_text()) >= self.input_length_mode_switch:
+                if self.input_mode != 'multi':
+                    self.init_multiline_mode(search=False)
+            else:
+                if self.input_mode != 'single':
+                    self.init_singleline_mode(search=False)
+
+    
     def try_clipboard_search(self):
         """
         Replace input with text in clipboard text only if it is different from
@@ -282,11 +294,7 @@ class PlingoFrame(PlingoFrameGenerated):
         return False
     
     def valid_clipboard_string(self, string):
-        if self.input_mode == 'single':
-            return string.strip().find(' ') < 0
-        else:
-            #TODO: Add a setting for max default len
-            return len(string) < 255
+        return len(string) < 255
     
     def toggle_minimize(self):
         if self.IsIconized():
@@ -499,11 +507,12 @@ class PlingoFrame(PlingoFrameGenerated):
     
     def OnTextSubmited(self, evt):
         self.search()
-    
+        
     def OnLetterEntered(self, evt):
         if len(self.get_input_text()):
             self.disable_autosearch = False
             self.letter_entered_timer = time.time()
+            self.try_auto_mode_switch()
         else:
             self.disable_autosearch = True
     
